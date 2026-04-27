@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tour Game - Map & Instructions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Google Maps JS API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwX-3N2xv84NUElCJRpKMh7UJpQEQnNH0"></script>
+    <style>
+      body {
+        margin: 0;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        background: rgba(255, 255, 255, 0.97);
+        padding: 36px 40px 32px 40px;
+        border-radius: 18px;
+        max-width: 95vw;
+        box-shadow: 0 4px 32px #0005;
+        text-align: center;
+        min-width: 320px;
+      }
+      h1 {
+        margin-bottom: 18px;
+        font-size: 2.2em;
+        color: #1e3c72;
+        letter-spacing: 1px;
+      }
+      ul {
+        text-align: left;
+        max-width: 400px;
+        margin: 0 auto 24px auto;
+        font-size: 1.08em;
+        line-height: 1.7;
+        color: #333;
+      }
+      #map {
+        width: 300px;
+        height: 300px;
+        margin: 0 auto 24px auto;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px #0002;
+      }
+      .start-btn {
+        background: #1e3c72;
+        color: white;
+        padding: 14px 44px;
+        font-size: 1.25em;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px #0002;
+        transition: background 0.2s;
+      }
+      .start-btn:hover {
+        background: #2a5298;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome to the Tour Game</h1>
+      <div style="font-size: 1.15em; color: #222; margin-bottom: 18px">
+        Instructions:
+      </div>
+      <ul>
+        <li>Use <b>WASD</b> or <b>arrow keys</b> to move.</li>
+        <li>Use the <b>mouse</b> to look around.</li>
+        <li>Explore the environment and interact with objects.</li>
+        <li>Refer to the <b>map</b> for your location.</li>
+      </ul>
+      <div id="map"></div>
+      <button
+        class="start-btn"
+        onclick="
+          window.location.href =
+            'https://unity-tour-maliba-matso-bridge-4vjp.vercel.app/'
+        "
+      >
+        Start
+      </button>
+    </div>
+    <script>
+      function initMap() {
+        var bridgeLocation = { lat: -29.181522, lng: 28.480962 };
+        var map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 15,
+          center: bridgeLocation,
+          mapTypeId: "satellite",
+          disableDefaultUI: true,
+        });
+        new google.maps.Marker({
+          position: bridgeLocation,
+          map: map,
+          title: "Malibamatso Bridge",
+          icon: {
+            url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+          },
+        });
+      }
+      window.onload = initMap;
+    </script>
+  </body>
+</html>
