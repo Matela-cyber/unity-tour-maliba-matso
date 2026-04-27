@@ -63,8 +63,24 @@
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>Welcome to the Tour Game</h1>
+    <div class="container" id="home-page">
+      <h1>Tour Game Map</h1>
+      <div id="map"></div>
+      <div style="margin: 18px 0">
+        <button class="start-btn" onclick="setMapType('roadmap')">
+          Normal View
+        </button>
+        <button class="start-btn" onclick="setMapType('satellite')">
+          Satellite View
+        </button>
+      </div>
+      <button class="start-btn" onclick="showInstructions()">
+        Virtual Tour
+      </button>
+    </div>
+
+    <div class="container" id="instructions-page" style="display: none">
+      <h1>Virtual Tour Instructions</h1>
       <div style="font-size: 1.15em; color: #222; margin-bottom: 18px">
         Instructions:
       </div>
@@ -74,7 +90,6 @@
         <li>Explore the environment and interact with objects.</li>
         <li>Refer to the <b>map</b> for your location.</li>
       </ul>
-      <div id="map"></div>
       <button
         class="start-btn"
         onclick="
@@ -82,13 +97,18 @@
             'https://unity-tour-maliba-matso-bridge-4vjp.vercel.app/'
         "
       >
-        Start
+        Start Virtual Tour
       </button>
+      <div style="margin-top: 16px">
+        <button class="start-btn" onclick="showHome()">Back to Map</button>
+      </div>
     </div>
+
     <script>
+      var map;
       function initMap() {
         var bridgeLocation = { lat: -29.181522, lng: 28.480962 };
-        var map = new google.maps.Map(document.getElementById("map"), {
+        map = new google.maps.Map(document.getElementById("map"), {
           zoom: 15,
           center: bridgeLocation,
           mapTypeId: "satellite",
@@ -103,6 +123,21 @@
           },
         });
       }
+
+      function setMapType(type) {
+        if (map) map.setMapTypeId(type);
+      }
+
+      function showInstructions() {
+        document.getElementById("home-page").style.display = "none";
+        document.getElementById("instructions-page").style.display = "block";
+      }
+
+      function showHome() {
+        document.getElementById("instructions-page").style.display = "none";
+        document.getElementById("home-page").style.display = "block";
+      }
+
       window.onload = initMap;
     </script>
   </body>
