@@ -20,28 +20,62 @@
         background: rgba(255, 255, 255, 0.97);
         padding: 36px 40px 32px 40px;
         border-radius: 18px;
-        max-width: 95vw;
+        max-width: 750px;
+        width: calc(95vw + 50px);
         box-shadow: 0 4px 32px #0005;
         text-align: center;
-        min-width: 320px;
+        min-width: 370px;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          max-width: 99vw;
+          padding: 18px 4vw 18px 4vw;
+        }
+        #map {
+          width: 98vw;
+          min-width: unset;
+          height: 220px;
+        }
+        .view-btn-group {
+          flex-direction: column;
+          gap: 8px;
+        }
+        .start-btn {
+          width: 100%;
+          box-sizing: border-box;
+          font-size: 1em;
+        }
+        ul {
+          max-width: 98vw;
+        }
+        .container > * {
+          max-width: 100%;
+        }
+        .container div[style*="background: #f3f0ff"] {
+          max-width: 100% !important;
+        }
       }
       h1 {
-        margin-bottom: 18px;
+        margin-top: 2px;
+        margin-bottom: 2px;
         font-size: 2.2em;
         color: #1e3c72;
         letter-spacing: 1px;
+        padding-top: 0;
+        padding-bottom: 0;
       }
       ul {
         text-align: left;
-        max-width: 400px;
+        max-width: 750px;
         margin: 0 auto 24px auto;
-        font-size: 1.08em;
+        font-size: 1em;
         line-height: 1.7;
         color: #333;
       }
       #map {
-        width: 300px;
-        height: 300px;
+        width: 670px;
+        height: 400px;
         margin: 0 auto 24px auto;
         border-radius: 12px;
         box-shadow: 0 2px 12px #0002;
@@ -49,16 +83,34 @@
       .start-btn {
         background: #1e3c72;
         color: white;
-        padding: 14px 44px;
-        font-size: 1.25em;
+        padding: 8px 18px;
+        font-size: 1em;
         border: none;
-        border-radius: 10px;
+        border-radius: 8px;
         cursor: pointer;
         box-shadow: 0 2px 8px #0002;
-        transition: background 0.2s;
+        transition:
+          background 0.2s,
+          box-shadow 0.2s,
+          color 0.2s;
+        outline: none;
       }
       .start-btn:hover {
         background: #2a5298;
+      }
+      .view-btn-group {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin: 18px 0;
+      }
+      .start-btn.active {
+        background: #fff;
+        color: #1e3c72;
+        border: 2px solid #2a5298;
+        box-shadow: 0 0 0 3px #2a5298cc;
+        font-weight: bold;
+        z-index: 1;
       }
     </style>
   </head>
@@ -66,32 +118,80 @@
     <div class="container" id="home-page">
       <h1>Tour Game Map</h1>
       <div id="map"></div>
-      <div style="margin: 18px 0">
-        <button class="start-btn" onclick="setMapType('roadmap')">
+      <div class="view-btn-group">
+        <button
+          class="start-btn"
+          id="normal-btn"
+          onclick="setMapType('roadmap')"
+        >
           Normal View
         </button>
-        <button class="start-btn" onclick="setMapType('satellite')">
+        <button
+          class="start-btn active"
+          id="satellite-btn"
+          onclick="setMapType('satellite')"
+        >
           Satellite View
         </button>
+        <button class="start-btn" id="tour-btn" onclick="showInstructions()">
+          Virtual Tour
+        </button>
       </div>
-      <button class="start-btn" onclick="showInstructions()">
-        Virtual Tour
-      </button>
     </div>
 
     <div class="container" id="instructions-page" style="display: none">
       <h1>Virtual Tour Instructions</h1>
-      <div style="font-size: 1.15em; color: #222; margin-bottom: 18px">
-        Instructions:
-      </div>
       <ul>
+        <li>
+          Ensure you have a stable internet connection as the virtual tour can
+          take up to <b>2 minutes</b> to load.
+        </li>
+        <li>Click the "Start Virtual Tour" button below.</li>
         <li>Use <b>WASD</b> or <b>arrow keys</b> to move.</li>
         <li>Use the <b>mouse</b> to look around.</li>
-        <li>Explore the environment and interact with objects.</li>
+        <li>Use the <b>V</b> key to switch camera.</li>
         <li>Refer to the <b>map</b> for your location.</li>
+        <li>Make sure your <b>speakers</b> are on to hear the audio.</li>
+        <div
+          style="
+            background: #f3f0ff;
+            color: #4b267d;
+            border-left: 5px solid #a084e8;
+            padding: 12px 18px;
+            margin: 10px 0 8px 0;
+            font-size: 1.08em;
+            border-radius: 8px;
+            font-weight: 500;
+            text-align: left;
+            max-width: 750px;
+          "
+        >
+          <b>Tip:</b> There are <b>three locations</b> highlighted with
+          <span style="color: #a084e8; font-weight: bold">purple columns</span
+          >.<br />
+          Move towards them:
+          <ul style="margin: 8px 0 0 18px; color: #4b267d">
+            <li>
+              The first two are on the road, the road is guided with invisible
+              borders.
+            </li>
+            <li>
+              The third location is on the mountain, accessible after you cross
+              the bridge.
+            </li>
+          </ul>
+        </div>
       </ul>
       <button
-        class="start-btn"
+        class="start-btn tour-primary"
+        style="
+          font-size: 1.15em;
+          padding: 14px 44px;
+          margin-bottom: 10px;
+          box-shadow: 0 4px 16px #2a529855;
+          font-weight: bold;
+          letter-spacing: 0.5px;
+        "
         onclick="
           window.location.href =
             'https://unity-tour-maliba-matso-bridge-4vjp.vercel.app/'
@@ -99,8 +199,21 @@
       >
         Start Virtual Tour
       </button>
-      <div style="margin-top: 16px">
-        <button class="start-btn" onclick="showHome()">Back to Map</button>
+      <div style="margin-top: 10px">
+        <button
+          class="start-btn tour-secondary"
+          style="
+            background: #eee;
+            color: #888;
+            border: 1px solid #ccc;
+            font-size: 0.95em;
+            padding: 7px 18px;
+            box-shadow: none;
+          "
+          onclick="showHome()"
+        >
+          Back to Map
+        </button>
       </div>
     </div>
 
@@ -122,20 +235,43 @@
             url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
           },
         });
+        // Set Satellite as active on load
+        document.getElementById("normal-btn").classList.remove("active");
+        document.getElementById("satellite-btn").classList.add("active");
       }
 
       function setMapType(type) {
         if (map) map.setMapTypeId(type);
+        // Toggle active button
+        document.getElementById("normal-btn").classList.remove("active");
+        document.getElementById("satellite-btn").classList.remove("active");
+        if (type === "roadmap") {
+          document.getElementById("normal-btn").classList.add("active");
+        } else if (type === "satellite") {
+          document.getElementById("satellite-btn").classList.add("active");
+        }
       }
 
       function showInstructions() {
         document.getElementById("home-page").style.display = "none";
         document.getElementById("instructions-page").style.display = "block";
+        // Highlight Virtual Tour button
+        document.getElementById("normal-btn").classList.remove("active");
+        document.getElementById("satellite-btn").classList.remove("active");
+        document.getElementById("tour-btn").classList.add("active");
       }
 
       function showHome() {
         document.getElementById("instructions-page").style.display = "none";
         document.getElementById("home-page").style.display = "block";
+        // Restore active state to map view
+        document.getElementById("tour-btn").classList.remove("active");
+        // Set active based on current map type
+        if (map && map.getMapTypeId() === "roadmap") {
+          document.getElementById("normal-btn").classList.add("active");
+        } else {
+          document.getElementById("satellite-btn").classList.add("active");
+        }
       }
 
       window.onload = initMap;
