@@ -112,6 +112,12 @@
         color: #333;
       }
 
+      .map-error .actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
       .map-error button {
         background: #1e3c72;
         color: #fff;
@@ -120,6 +126,12 @@
         padding: 10px 16px;
         font-size: 0.95em;
         cursor: pointer;
+      }
+
+      .map-error button.secondary {
+        background: #eee;
+        color: #444;
+        border: 1px solid #ddd;
       }
 
       .start-btn {
@@ -272,28 +284,43 @@
         wrap.className = 'map-error';
 
         var title = document.createElement('h2');
-        title.textContent = 'Map unavailable';
+        title.textContent = 'Interactive map temporarily unavailable';
 
         var text = document.createElement('p');
         text.textContent = message;
 
+        var actions = document.createElement('div');
+        actions.className = 'actions';
+
         var retryButton = document.createElement('button');
         retryButton.type = 'button';
-        retryButton.textContent = 'Refresh page';
+        retryButton.textContent = 'Reload map';
         retryButton.onclick = function () {
           window.location.reload();
         };
 
+        var continueButton = document.createElement('button');
+        continueButton.type = 'button';
+        continueButton.className = 'secondary';
+        continueButton.textContent = 'Continue to tour';
+        continueButton.onclick = function () {
+          // Let users continue even without the map
+          showInstructions();
+        };
+
+        actions.appendChild(retryButton);
+        actions.appendChild(continueButton);
+
         wrap.appendChild(title);
         wrap.appendChild(text);
-        wrap.appendChild(retryButton);
+        wrap.appendChild(actions);
         mapDiv.appendChild(wrap);
       }
 
       function handleMapScriptError() {
-        console.error('Google Maps script failed to load. This can happen when the API key is blocked, restricted, or billing is disabled.');
+        console.error('Google Maps script failed to load.');
         showMapError(
-          'The map could not load because the Google Maps API is unavailable. This often happens when the API key is blocked, restricted, or billing is disabled.'
+          "The interactive map couldn't be loaded right now. No worries — you can reload to try again or continue the tour without the map."
         );
       }
 
@@ -301,7 +328,7 @@
         if (!window.google || !window.google.maps) {
           console.error('Google Maps JavaScript API failed to initialize.');
           showMapError(
-            'Google Maps did not load correctly. If the API key was intentionally blocked to avoid costs, the map will stay unavailable until it is enabled again.'
+            "Interactive map is not available at the moment. You can still explore the tour — the experience works without the map."
           );
           return;
         }
@@ -328,9 +355,9 @@
       }
 
       window.gm_authFailure = function () {
-        console.error('Google Maps authentication failure. The API key may be invalid, restricted, or billing has been disabled.');
+        console.error('Google Maps authentication failure.');
         showMapError(
-          'Google Maps is currently unavailable because the API key is not allowed to access the Maps JavaScript API. This usually means the key is restricted or billing is disabled.'
+          "The interactive map isn't permitted to run in this environment right now. That's intentional in some setups — you can reload to try again or continue the tour without the map."
         );
       };
 
@@ -357,7 +384,7 @@
         document.getElementById('instructions-page').style.display = 'none';
         document.getElementById('home-page').style.display = 'block';
         document.getElementById('tour-btn').classList.remove('active');
-        if (map && map.getMapTypeId() === 'roadmap') {
+        if (map && map.getMapTypeId && map.getMapTypeId() === 'roadmap') {
           document.getElementById('normal-btn').classList.add('active');
         } else {
           document.getElementById('satellite-btn').classList.add('active');
@@ -371,7 +398,7 @@
             var mapDiv = document.getElementById('map');
             if (mapDiv && mapDiv.innerHTML.trim() === '') {
               showMapError(
-                'This page did not load Google Maps correctly. If the API was intentionally blocked to avoid costs, the map will stay unavailable until it is enabled again.'
+                "Interactive map didn't initialize. You can reload to try again or continue the tour — everything else works as expected."
               );
             }
           }
