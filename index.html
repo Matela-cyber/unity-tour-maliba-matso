@@ -4,8 +4,12 @@
     <meta charset="utf-8" />
     <title>Tour Game - Map & Instructions</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Google Maps JS API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwX-3N2xv84NUElCJRpKMh7UJpQEQnNH0"></script>
+    <script
+      async
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwX-3N2xv84NUElCJRpKMh7UJpQEQnNH0&callback=initMap"
+      onerror="handleMapScriptError()"
+    ></script>
     <style>
       body {
         margin: 0;
@@ -79,7 +83,45 @@
         margin: 0 auto 24px auto;
         border-radius: 12px;
         box-shadow: 0 2px 12px #0002;
+        overflow: hidden;
       }
+
+      .map-error {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 24px;
+        box-sizing: border-box;
+        background: linear-gradient(180deg, #ffffff 0%, #f4f1ff 100%);
+        color: #4b267d;
+        text-align: center;
+      }
+
+      .map-error h2 {
+        margin: 0 0 10px;
+        color: #1e3c72;
+        font-size: 1.2em;
+      }
+
+      .map-error p {
+        margin: 0 0 14px;
+        line-height: 1.6;
+        color: #333;
+      }
+
+      .map-error button {
+        background: #1e3c72;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 0.95em;
+        cursor: pointer;
+      }
+
       .start-btn {
         background: #1e3c72;
         color: white;
@@ -219,62 +261,122 @@
 
     <script>
       var map;
+
+      function showMapError(message) {
+        var mapDiv = document.getElementById('map');
+        if (!mapDiv) return;
+
+        mapDiv.innerHTML = '';
+
+        var wrap = document.createElement('div');
+        wrap.className = 'map-error';
+
+        var title = document.createElement('h2');
+        title.textContent = 'Map unavailable';
+
+        var text = document.createElement('p');
+        text.textContent = message;
+
+        var retryButton = document.createElement('button');
+        retryButton.type = 'button';
+        retryButton.textContent = 'Refresh page';
+        retryButton.onclick = function () {
+          window.location.reload();
+        };
+
+        wrap.appendChild(title);
+        wrap.appendChild(text);
+        wrap.appendChild(retryButton);
+        mapDiv.appendChild(wrap);
+      }
+
+      function handleMapScriptError() {
+        console.error('Google Maps script failed to load. This can happen when the API key is blocked, restricted, or billing is disabled.');
+        showMapError(
+          'The map could not load because the Google Maps API is unavailable. This often happens when the API key is blocked, restricted, or billing is disabled.'
+        );
+      }
+
       function initMap() {
+        if (!window.google || !window.google.maps) {
+          console.error('Google Maps JavaScript API failed to initialize.');
+          showMapError(
+            'Google Maps did not load correctly. If the API key was intentionally blocked to avoid costs, the map will stay unavailable until it is enabled again.'
+          );
+          return;
+        }
+
         var bridgeLocation = { lat: -29.181522, lng: 28.480962 };
-        map = new google.maps.Map(document.getElementById("map"), {
+        map = new google.maps.Map(document.getElementById('map'), {
           zoom: 15,
           center: bridgeLocation,
-          mapTypeId: "satellite",
+          mapTypeId: 'satellite',
           disableDefaultUI: true,
         });
+
         new google.maps.Marker({
           position: bridgeLocation,
           map: map,
-          title: "Malibamatso Bridge",
+          title: 'Malibamatso Bridge',
           icon: {
-            url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+            url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
           },
         });
-        // Set Satellite as active on load
-        document.getElementById("normal-btn").classList.remove("active");
-        document.getElementById("satellite-btn").classList.add("active");
+
+        document.getElementById('normal-btn').classList.remove('active');
+        document.getElementById('satellite-btn').classList.add('active');
       }
+
+      window.gm_authFailure = function () {
+        console.error('Google Maps authentication failure. The API key may be invalid, restricted, or billing has been disabled.');
+        showMapError(
+          'Google Maps is currently unavailable because the API key is not allowed to access the Maps JavaScript API. This usually means the key is restricted or billing is disabled.'
+        );
+      };
 
       function setMapType(type) {
         if (map) map.setMapTypeId(type);
-        // Toggle active button
-        document.getElementById("normal-btn").classList.remove("active");
-        document.getElementById("satellite-btn").classList.remove("active");
-        if (type === "roadmap") {
-          document.getElementById("normal-btn").classList.add("active");
-        } else if (type === "satellite") {
-          document.getElementById("satellite-btn").classList.add("active");
+        document.getElementById('normal-btn').classList.remove('active');
+        document.getElementById('satellite-btn').classList.remove('active');
+        if (type === 'roadmap') {
+          document.getElementById('normal-btn').classList.add('active');
+        } else if (type === 'satellite') {
+          document.getElementById('satellite-btn').classList.add('active');
         }
       }
 
       function showInstructions() {
-        document.getElementById("home-page").style.display = "none";
-        document.getElementById("instructions-page").style.display = "block";
-        // Highlight Virtual Tour button
-        document.getElementById("normal-btn").classList.remove("active");
-        document.getElementById("satellite-btn").classList.remove("active");
-        document.getElementById("tour-btn").classList.add("active");
+        document.getElementById('home-page').style.display = 'none';
+        document.getElementById('instructions-page').style.display = 'block';
+        document.getElementById('normal-btn').classList.remove('active');
+        document.getElementById('satellite-btn').classList.remove('active');
+        document.getElementById('tour-btn').classList.add('active');
       }
 
       function showHome() {
-        document.getElementById("instructions-page").style.display = "none";
-        document.getElementById("home-page").style.display = "block";
-        // Restore active state to map view
-        document.getElementById("tour-btn").classList.remove("active");
-        // Set active based on current map type
-        if (map && map.getMapTypeId() === "roadmap") {
-          document.getElementById("normal-btn").classList.add("active");
+        document.getElementById('instructions-page').style.display = 'none';
+        document.getElementById('home-page').style.display = 'block';
+        document.getElementById('tour-btn').classList.remove('active');
+        if (map && map.getMapTypeId() === 'roadmap') {
+          document.getElementById('normal-btn').classList.add('active');
         } else {
-          document.getElementById("satellite-btn").classList.add("active");
+          document.getElementById('satellite-btn').classList.add('active');
         }
       }
 
-      window.onload = initMap;
+      // Friendly fallback in case Google Maps never initializes.
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          if (!window.google || !window.google.maps) {
+            var mapDiv = document.getElementById('map');
+            if (mapDiv && mapDiv.innerHTML.trim() === '') {
+              showMapError(
+                'This page did not load Google Maps correctly. If the API was intentionally blocked to avoid costs, the map will stay unavailable until it is enabled again.'
+              );
+            }
+          }
+        }, 6000);
+      });
     </script>
   </body>
 </html>
